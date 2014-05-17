@@ -1,7 +1,7 @@
 {
   "name": "popcms",
   "description": "NodeJS, MongoDB website content management system",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "main": "./popcms.js",
   "author": "John Puddifoot <john@eastpoint.co.uk>",
   "keywords": [],
