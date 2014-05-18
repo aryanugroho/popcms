@@ -84,6 +84,6 @@ exports.createServer = function(settings) {
 		  } 
 	  }
 	));  
-    
+    return true;
 }; 
  
