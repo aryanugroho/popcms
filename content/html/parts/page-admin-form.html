@@ -1,0 +1,178 @@
+<style>
+	.cke_editable {
+		min-height: 200px;
+		border:1px dashed #999;
+	}
+	
+</style>
+<form id="pageSettings">
+            <div class="row">
+                <div class="col-sm-1"><strong>Settings</strong><br />
+                    <a href="/logout/">Logout</a>
+                </div>
+                <div class="col-sm-2"> 
+                    template: 
+                    <select id="pageTemplate" name="template" required="true">   
+                        {{#select template}}
+                        <option value="">Template</option> 
+						{{#each templateList}}
+                        <option value="{{name}}">{{name}}</option>
+						{{/each}}
+                        {{/select}}  
+                    </select> 
+                </div>
+                <div class="col-sm-2"> 
+                    title <span id="pageTitleCount"></span>: <input type="text" id="pageTitle" value="{{title}}" placeholder="Page title" />
+                </div>
+                <div class="col-sm-2"> 
+                    keywords <span id="pageKeywordsCount"></span>: <input type="text" id="pageKeywords" value="{{keywords}}" placeholder="Page keywords" />
+                </div>
+                <div class="col-sm-2"> 
+                    description <span id="pageDescriptionCount"></span>: <input type="text" id="pageDescription" value="{{description}}" placeholder="Page description" />
+                </div> 
+                <div class="col-sm-1"><br /><input type="submit" value="Save" /></div>
+                <div class="col-sm-2">  
+                    last updated by {{modifiedBy}} on {{modifiedDate}}
+                </div> 
+            </div>
+        </form> 
+<script>
+	 
+if (typeof jQuery === 'undefined') {
+  
+	function getScript(url, success) {
+	
+		var script     = document.createElement('script');
+		     script.src = url;
+		
+		var head = document.getElementsByTagName('head')[0],
+		done = false;
+		
+		// Attach handlers for all browsers
+		script.onload = script.onreadystatechange = function() {
+		
+			if (!done && (!this.readyState || this.readyState === 'loaded' || this.readyState === 'complete')) {
+			
+			done = true;
+				
+				// callback function provided as param
+				success();
+				
+				script.onload = script.onreadystatechange = null;
+				head.removeChild(script);
+				
+			};
+		
+		};
+		
+		head.appendChild(script);
+	
+	};
+	
+	getScript('//code.jquery.com/jquery.min.js', function() {
+	
+		if (typeof jQuery==='undefined') { 
+			alert('Unable to load jQuery');
+		
+		} else {
+			getCKEDITOR();
+		}
+	
+	});
+	
+} else { // jQuery was already loaded
+	getCKEDITOR();
+
+};
+
+var getCKEDITOR = function()
+{
+	getScript('//cdnjs.cloudflare.com/ajax/libs/ckeditor/4.3.2/ckeditor.js', function() {
+		
+		if (typeof CKEDITOR==='undefined') { 
+			alert('Unable to load CKEDITOR'); 
+		} else {
+			formLoad();
+		} 
+		
+	});
+};
+	
+	function reloadPage(){
+		changeCount=0;
+		window.location.reload(true);
+	}
+	 
+	function calcTotals(){
+			$("#pageTitleCount").html(" (<b>" + $("#pageTitle").val().length + "</b>, aim max 70)");
+			$("#pageKeywordsCount").html(" (<b>" + $("#pageKeywords").val().length + "</b>)");
+			$("#pageDescriptionCount").html("<b> (" + $("#pageDescription").val().length + "</b>, aim for:  150-160)");
+	}
+
+	function InstanceReadyEvent() {
+
+		this.document.on("keyup", function () {
+		   changeCount += 1;
+		   calcTotals();
+		});
+	}
+	var formLoad = function(){
+        // This property tells CKEditor to not activate every element with contenteditable=true element.
+         CKEDITOR.disableAutoInline = true;
+          
+        var changeCount = 0;
+        window.onbeforeunload = function() {
+            if(changeCount>0)
+            {
+                return "You didn't save your changes!";
+            }
+        }; 
+         
+        $("#pageSettings").submit(function(){ 
+            var template = $("#pageTemplate").val();
+            var data = {
+                "permalink":"{{permalink}}",
+                "template":template,
+                "title":$("#pageSettings #pageTitle").val(),
+                "keywords":$("#pageSettings #pageKeywords").val(),
+                "description":$("#pageSettings #pageDescription").val(),
+                "body":{}
+            };
+
+            try
+            {
+
+				for(var i in CKEDITOR.instances) { 
+					data.body[CKEDITOR.instances[i].name] = CKEDITOR.instances[i].getData(); 
+				}   
+			}
+			catch(e)
+			{
+				alert(e);
+			} 
+
+            //return false;
+            
+            $.ajax({
+                type: "POST",
+                url: "/api/pages/",
+                data: data,
+                complete: reloadPage,
+                dataType: "application/json"
+            });  
+            return false;
+        });  
+            
+		$("div[contenteditable='true']").each(function(idx, obj)
+		{   
+			//alert(obj.id);
+			CKEDITOR.inline(obj.id,
+			  { 
+				 customConfig: '/js/ckeditor.js' 
+			  }); 
+			CKEDITOR.instances[obj.id].on("instanceReady", InstanceReadyEvent);
+		});
+
+        calcTotals();
+	}
+    </script>   

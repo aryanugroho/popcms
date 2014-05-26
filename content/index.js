@@ -7,7 +7,9 @@ var navigation = require('../db/navigation/');
 var nav = null;
 var templatePath = __dirname + '/../html';
 
-navigation.getFullNav(function(data){
+navigation.getFullNav(function(err, data){
+	if(err){console.log(err)}
+	console.log('got nav:' + data);
     nav=data;
 });
 
@@ -33,9 +35,55 @@ var removePageFromCache= function(url) {
  
 function implementTemplate(req, pageData, callback) {
 	
+	
+	if(pageData===null) {pageData = {};}
+	if(pageData.template === null || typeof(pageData.template) === "undefined")
+	{
+		pageData.template="404.html";
+	}
  
-    var body = fs.readFileSync(templatePath + '/master.html', 'utf8'); 
-    var source = fs.readFileSync(templatePath + '/' + 'landing-page' + '.html', 'utf8'); 
+    var body, source;
+	try
+	{
+		body = fs.readFileSync(templatePath + '/master.html', 'utf8'); 
+	}
+	catch(e)
+	{
+		body="Please add your master page at '" + templatePath + "/master.html'";
+	}
+	
+	try
+	{
+		source= fs.readFileSync(templatePath + '/' + pageData.template + '', 'utf8'); 
+	}
+	catch(e)
+	{
+		source="Please add your selected template file to '" + templatePath + "/" + pageData.template + "'";
+	};
+	
+	body = body.replace("[[[body]]]", source);
+	
+	pageData.navigation = nav;
+	
+	console.log("Data : " + JSON.stringify(pageData));
+	
+	if(pageData.admin){
+		var adminHtml = fs.readFileSync(__dirname + '/html/parts/page-admin-form.html', 'utf8'); 
+		body = body.replace("</body>", adminHtml + "</body>");
+		
+		// get list of templates
+		var files = fs.readdirSync(templatePath);
+		// will eventually be a bit more delicate with this, for instance filting based on filename or extension.
+		pageData.templateList = []; 
+		files.forEach(function(entry) {
+			if(entry!=="master.html")
+			{
+				pageData.templateList.push({"name" : entry}); 
+			}
+			
+		});
+	}
+	
     var template = handlebars.compile(body.replace("[[[body]]]", source)); 
     var result = template(pageData);  
 
@@ -55,12 +103,13 @@ function getPageFromDb(req, callback){
 			
 			if(data===null){ 
 				data = {title:"Page not found"}
+				data.contentEditable = false;
 			}
 			
 			if(req.user)
 			{
 				data.admin = true;
-				
+				data.contentEditable = true;
 			}
 
 			implementTemplate(req, data, function(err, htmlContent){

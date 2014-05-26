@@ -4,6 +4,28 @@
  * and open the template in the editor.
  */
 
+function parseNodesToNav(nodes) { 
+	var list;
+			console.log(nodes);
+	if (nodes) {
+
+		var list = "<ul>";
+		for(var i=0; i<nodes.length; i++) {
+			list += (parseNodeToNav(nodes[i]));
+		}
+		list += "</ul>";
+	}
+    return list;
+}
+
+function parseNodeToNav(node) { // takes a node object and turns it into a <li>
+    var item = "<li><a href='" + node.url + "'>"; 
+    item += node.name; 
+    if(node.pages) item += parseNodesToNav(node.pages);
+	item += "</a></li>";
+    return item;
+}
+
 
 exports.register = function(handlebars){ 
     handlebars.registerHelper('select', function(selected, options) {
@@ -12,6 +34,14 @@ exports.register = function(handlebars){
             new RegExp(' value=\"' + selected + '\"'),
             '$& selected="selected"');
     }); 
+
+	handlebars.registerHelper('nav', function (pages, options){
+		if(pages)
+		{ 
+			return parseNodesToNav(pages);
+		}
+	});
+
 
     handlebars.registerHelper('ifMatch', function (v1, v2, options) {
         if (v1 === v2) {

@@ -48,6 +48,8 @@ exports.createServer = function(settings) {
         res.redirect('/');
     });     
 	
+    require('./api/pages')(server);
+	
 	content.setConfig({templatePath : settings.templatePath});
 	
 	/* the default: check for page in db*/
@@ -57,8 +59,7 @@ exports.createServer = function(settings) {
 	server.listen(port, function() {
 		settings.port = port;
 	  console.log("Listening on " + port);
-	});  
-	
+	});
 	
 	passport.serializeUser(function(user, done) {
 	  done(null, user);

@@ -8,7 +8,6 @@ module.exports = function attachHandlers (router) {
 };
   
 function isAuthenticatedRequest(req, res, next) {
-    console.log(req.user);
   if (req.user) {
     next();
   } else {
@@ -21,7 +20,7 @@ function list(req, res)
     db.getAll({}, function(data){
         res.json(data);
     });
-} 
+}
 
 function view(req, res)
 { 
@@ -29,14 +28,12 @@ function view(req, res)
         res.json(data);
     });
 } 
- 
 
 function upsertPermalink(req, res)
 {  
     if(
         !req.body.hasOwnProperty('template') ||
-        !req.body.hasOwnProperty('pagePermalink') ||
-        !req.body.hasOwnProperty('sectionPermalink')
+        !req.body.hasOwnProperty('permalink') 
             
             ){
         res.statusCode = 400;
@@ -45,8 +42,7 @@ function upsertPermalink(req, res)
     
     var dataToStore = {
         "template": req.body.template,
-        "sectionPermalink": req.body.sectionPermalink,
-        "pagePermalink": req.body.pagePermalink,
+        "permalink": req.body.permalink, 
         "modifiedDate": new Date(),
         "modifiedBy": req.user.displayName
     };
@@ -61,7 +57,8 @@ function upsertPermalink(req, res)
     
     console.log(dataToStore);
 
-    db.upsertPermalink(dataToStore, function(data){
+    db.upsertPermalink(dataToStore, function(err, data){
+		if(err){return res.statusCode(500);}
         res.type('application/json');
         res.json({"Status":200, "Message" : "Success", "Data" : data});
     });
