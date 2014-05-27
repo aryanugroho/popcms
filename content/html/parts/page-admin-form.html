@@ -38,6 +38,21 @@
         </form> 
 <script>
 	 
+	 
+	 
+var getCKEDITOR = function()
+{
+	getScript('//cdnjs.cloudflare.com/ajax/libs/ckeditor/4.3.2/ckeditor.js', function() {
+		
+		if (typeof CKEDITOR==='undefined') { 
+			alert('Unable to load CKEDITOR'); 
+		} else {
+			formLoad();
+		} 
+		
+	});
+};
+	 
 if (typeof jQuery === 'undefined') {
   
 	function getScript(url, success) {
@@ -85,18 +100,6 @@ if (typeof jQuery === 'undefined') {
 
 };
 
-var getCKEDITOR = function()
-{
-	getScript('//cdnjs.cloudflare.com/ajax/libs/ckeditor/4.3.2/ckeditor.js', function() {
-		
-		if (typeof CKEDITOR==='undefined') { 
-			alert('Unable to load CKEDITOR'); 
-		} else {
-			formLoad();
-		} 
-		
-	});
-};
 	
 	function reloadPage(){
 		changeCount=0;
@@ -151,6 +154,7 @@ var getCKEDITOR = function()
 				alert(e);
 			} 
 
+			//alert(JSON.stringify(data));
             //return false;
             
             $.ajax({

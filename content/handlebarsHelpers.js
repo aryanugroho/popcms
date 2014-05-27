@@ -4,24 +4,24 @@
  * and open the template in the editor.
  */
 
-function parseNodesToNav(nodes) { 
+function parseNodesToNav(nodes, level) { 
 	var list;
 			console.log(nodes);
 	if (nodes) {
 
-		var list = "<ul>";
+		var list = "<ul class='navLevel" + level + "'>";
 		for(var i=0; i<nodes.length; i++) {
-			list += (parseNodeToNav(nodes[i]));
+			list += parseNodeToNav(nodes[i], level);
 		}
 		list += "</ul>";
 	}
     return list;
 }
 
-function parseNodeToNav(node) { // takes a node object and turns it into a <li>
+function parseNodeToNav(node, level) { // takes a node object and turns it into a <li>
     var item = "<li><a href='" + node.url + "'>"; 
     item += node.name; 
-    if(node.pages) item += parseNodesToNav(node.pages);
+    if(node.pages) item += parseNodesToNav(node.pages, level + 1);
 	item += "</a></li>";
     return item;
 }
@@ -38,7 +38,7 @@ exports.register = function(handlebars){
 	handlebars.registerHelper('nav', function (pages, options){
 		if(pages)
 		{ 
-			return parseNodesToNav(pages);
+			return parseNodesToNav(pages, 0);
 		}
 	});
 

@@ -18,7 +18,7 @@ exports.helloWorld = function(){
 exports.createServer = function(settings) {
     
 	config = settings; 
-	
+	 
     var server = express();  
     server.use(express.cookieParser()); 
     server.use(express.bodyParser());
@@ -26,14 +26,16 @@ exports.createServer = function(settings) {
     server.use(passport.initialize());
     server.use(passport.session());
     
+	server.config = config;
+	
 	 
 	 /* Handle static files*/
-    server.use('/css', express.static(__dirname + '/static/css'));
-    server.use('/img', express.static(__dirname + '/static/img'));
-    server.use('/fonts', express.static(__dirname + '/static/fonts'));
-    server.use('/js', express.static(__dirname + '/static/js'));
+    server.use('/css', express.static(config.staticFilePath + '/css'));
+    server.use('/img', express.static(config.staticFilePath + '/img'));
+    server.use('/fonts', express.static(config.staticFilePath + '/fonts'));
+    server.use('/js', express.static(config.staticFilePath + '/js'));
     server.get('/robots.txt', function(req, res){
-		res.sendfile(__dirname + '/static/robots.txt');
+		res.sendfile(config.staticFilePath + '/robots.txt');
 	});
 	
     server.get('/auth/google', passport.authenticate('google'));

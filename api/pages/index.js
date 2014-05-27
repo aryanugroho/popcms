@@ -1,13 +1,16 @@
 var db = require("../../db/pages/");
  
+ var config;
 module.exports = function attachHandlers (router) { 
     // get requests
     router.get('/api/pages', list);
     router.get('/api/pages/:id', view); 
     router.post('/api/pages', isAuthenticatedRequest, upsertPermalink); 
+	this.config = router.config; 
 };
   
 function isAuthenticatedRequest(req, res, next) {
+  console.log(this.config);
   if (req.user) {
     next();
   } else {
@@ -43,6 +46,7 @@ function upsertPermalink(req, res)
     var dataToStore = {
         "template": req.body.template,
         "permalink": req.body.permalink, 
+        "body": req.body.body, 
         "modifiedDate": new Date(),
         "modifiedBy": req.user.displayName
     };

@@ -40,6 +40,7 @@ function implementTemplate(req, pageData, callback) {
 	if(pageData.template === null || typeof(pageData.template) === "undefined")
 	{
 		pageData.template="404.html";
+		pageData.permalink = req.url;
 	}
  
     var body, source;
