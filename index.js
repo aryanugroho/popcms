@@ -18,7 +18,7 @@ exports.helloWorld = function(){
 exports.createServer = function(settings) {
     
 	config = settings; 
-	 
+	
     var server = express();  
     server.use(express.cookieParser()); 
     server.use(express.bodyParser());
@@ -50,12 +50,8 @@ exports.createServer = function(settings) {
         res.redirect('/');
     });     
 	
-    require('./api/pages')(server);
-	
-	content.setConfig({templatePath : settings.templatePath});
-	
-	/* the default: check for page in db*/
-    server.get('*', content.getPage);
+    require('./api/pages')(server); 
+    require('./content')(server);
     
 	var port = Number(process.env.PORT || settings.port);
 	server.listen(port, function() {

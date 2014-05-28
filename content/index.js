@@ -3,13 +3,21 @@ var handlebarsHelpers = require('./handlebarsHelpers.js');
 var fs = require('fs'); 
 var pages = require('../db/pages/');
 var navigation = require('../db/navigation/'); 
-
 var nav = null;
 var templatePath = __dirname + '/../html';
 
+var config;
+module.exports = function attachHandlers (router) { 
+    // get requests 
+    router.get('*', getPage); 
+	config = router.config; 
+	templatePath = config.templatePath;
+};
+  
+
 navigation.getFullNav(function(err, data){
 	if(err){console.log(err)}
-	console.log('got nav:' + data);
+	//console.log('got nav:' + data);
     nav=data;
 });
 
@@ -94,7 +102,7 @@ function implementTemplate(req, pageData, callback) {
 function getPageFromDb(req, callback){
  
     try{   
-        pages.getByPermalink(req.url, function (err, data) 
+        pages.getByPermalink(req.url, config.connString, function (err, data) 
 		{  
 			if(err){return callback(err);}
 			
@@ -126,14 +134,15 @@ function getPageFromDb(req, callback){
  }
  
 
-exports.setConfig = function(settings){
+setConfig = function(settings){
 	templatePath = settings.templatePath;
 };
 
-exports.getPage =function(req, res) {  
+getPage =function(req, res) { 
 	getPageFromDb(req, function (err, htmlContent)
 	{
-		if(err){console.log(err);return res.send(500);}
+		if(err){console.log(err);
+			return res.send(500);}
 		return res.send(htmlContent);
 	});
 
