@@ -20,6 +20,14 @@ popcms.createServer(
 			port : "5000",
 			adminEmail : "me@googlemailbox.com", // admin account to use with Google Auth
 			secret : "RANDOM_STRING",
-			connString :  "mongodb://UserName:Password@DbHost:DbPort/DbName"
+			connString :  "mongodb://UserName:Password@DbHost:DbPort/DbName",
+			
+			sendgrid: {
+			    username: "SENDGRID_USERNAME",
+			    password: "SENDGRID_PASSWORD",
+			    contactMailTo: "CONTACT_FORM_TO_ADDRESS",
+			    contactMailFrom: "CONTACT_FORM_FROM_ADDRESS",
+			    contactSubject: "CONTACT_FORM_SUBJECT" 
+			}
 		}
 );
