@@ -1,16 +1,15 @@
 var db = require("../../db/pages/");
  
- var config;
+var config;
 module.exports = function attachHandlers (router) { 
     // get requests
     router.get('/api/pages', list);
     router.get('/api/pages/:id', view); 
     router.post('/api/pages', isAuthenticatedRequest, upsertPermalink); 
-	this.config = router.config; 
+	config = router.config; 
 };
   
 function isAuthenticatedRequest(req, res, next) {
-  console.log(this.config);
   if (req.user) {
     next();
   } else {
@@ -20,14 +19,14 @@ function isAuthenticatedRequest(req, res, next) {
 
 function list(req, res)
 { 
-    db.getAll({}, function(data){
+    db.getAll({}, config.connString,function(data){
         res.json(data);
     });
 }
 
 function view(req, res)
 { 
-    db.getById(req.params.id, function(data){
+    db.getById(req.params.id, config.connString,function(data){
         res.json(data);
     });
 } 
@@ -61,7 +60,7 @@ function upsertPermalink(req, res)
     
     console.log(dataToStore);
 
-    db.upsertPermalink(dataToStore, function(err, data){
+    db.upsertPermalink(dataToStore, config.connString,function(err, data){
 		if(err){return res.statusCode(500);}
         res.type('application/json');
         res.json({"Status":200, "Message" : "Success", "Data" : data});

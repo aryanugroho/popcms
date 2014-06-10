@@ -2,11 +2,9 @@ var dbconn = require("../");
 var mongo = require("mongodb");
 var BSON = mongo.BSONPure;  
 
-var connString = 
-		"mongodb://127.0.0.1:27017/popcms";
 var collectionName = "pages";
 
-exports.getByPermalink= function (permalink, callback) {  
+exports.getByPermalink= function (permalink, connString, callback) {  
     dbconn.getDb(connString, function(err, db){ 
 		if(err)
 		{
@@ -26,7 +24,7 @@ exports.getByPermalink= function (permalink, callback) {
 
 
 
-exports.upsertPermalink = function(data, callback){
+exports.upsertPermalink = function(data, connString, callback){
 	
     console.log("upsertPermalink");
     if(callback === null || typeof(callback) !== "function")

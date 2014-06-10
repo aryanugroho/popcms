@@ -1,0 +1,101 @@
+
+<form method="POST" id="contactForm" action="/api/contact/">
+	<div class="inputs">
+
+		<div class="control-group">  
+			<div class="controls"> 
+				<input type="text" name='Name' id="contactName" required="required"  placeholder="Your name" />   
+			</div>  
+		</div>  
+		<div class="control-group">  
+			<div class="controls">  
+				<input type="email" name='Email' id="contactEmail"  required="required" placeholder="Your email address" />  
+			</div>  
+		</div> 
+		<div class="control-group">  
+			<div class="controls">  
+				<input type="text" name="Phone" id="contactPhone"  required="required"  placeholder="Your phone number" />  
+			</div>  
+		</div>
+		<div class="control-group">  
+			<div class="controls">  
+				<textarea id="contactMessage" name="Message" rows="8" placeholder="Message."></textarea>  
+			</div>  
+		</div>   
+		<div class="text-right">  
+			<input type="hidden" name="save" value="contact">  
+			<button type="submit" class="btn-main">Submit</button>  
+		</div>  
+
+	</div>
+	<div class="response" style='display:none;'>
+		<h2><i class="fa fa-check-circle-o"></i> Thank you!</h2>
+		<p>Your message has been sent and we will be in touch shortly.</p> 
+	</div>
+</form>
+
+<script> 
+    function getScript(url, success) { 
+        var script = document.createElement('script');
+        script.src = url; 
+        var head = document.getElementsByTagName('head')[0],
+        done = false;  
+        script.onload = script.onreadystatechange = function () { 
+            if (!done && (!this.readyState || this.readyState === 'loaded' || this.readyState === 'complete')) { 
+                done = true;  
+                success(); 
+                script.onload = script.onreadystatechange = null;
+                head.removeChild(script); 
+            }; 
+        }; 
+        head.appendChild(script); 
+    };
+    function SetFormHandler()
+    {
+
+        $("#contactForm").submit(function () {
+
+            var data = {
+                "Name": $("#contactName").val(),
+                "Email": $("#contactEmail").val(),
+                "Phone": $("#contactPhone").val(),
+                "Message": $("#contactMessage").val()
+            };
+
+            var sendIt = true; 
+
+            if (sendIt) {
+                $.ajax({
+                    type: "POST",
+                    url: "/api/contact/",
+                    data: data,
+                    dataType: "json",
+
+                }).done(function () {
+                    $("form .inputs").slideUp(300);
+                    $("form .response").slideDown(300);
+                    $("#contactName").val("");
+                    $("#contactEmail").val("");
+                    $("#contactPhone").val("");
+                    $("#contactMessage").val("");
+                }).fail(function () {
+                    alert("error");
+                });
+            }
+            return false;
+        });
+    }
+
+    if (typeof jQuery === 'undefined') {
+        getScript('//code.jquery.com/jquery.min.js', function () { 
+            if (typeof jQuery === 'undefined') {
+                alert('Unable to load jQuery'); 
+            } else {
+                SetFormHandler();
+            } 
+        }); 
+    } else { // jQuery was already loaded
+        SetFormHandler();  
+    };
+
+</script>

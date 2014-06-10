@@ -3,13 +3,21 @@ var handlebarsHelpers = require('./handlebarsHelpers.js');
 var fs = require('fs'); 
 var pages = require('../db/pages/');
 var navigation = require('../db/navigation/'); 
-
 var nav = null;
 var templatePath = __dirname + '/../html';
 
+var config;
+module.exports = function attachHandlers (router) { 
+    // get requests 
+    router.get('*', getPage); 
+	config = router.config; 
+	templatePath = config.templatePath;
+};
+  
+
 navigation.getFullNav(function(err, data){
 	if(err){console.log(err)}
-	console.log('got nav:' + data);
+	//console.log('got nav:' + data);
     nav=data;
 });
 
@@ -64,6 +72,20 @@ function implementTemplate(req, pageData, callback) {
 	
 	body = body.replace("[[[body]]]", source);
 	
+	
+	// add standard contact form
+	try
+	{
+		if(body.indexOf("[[[contactform]]]") > 0){ 
+			source= fs.readFileSync(__dirname + '/html/parts/contact-form.html', 'utf8'); 
+			body = body.replace("[[[contactform]]]", source);
+		}
+	}
+	catch(e)
+	{
+		alert(e);
+	};
+	
 	pageData.navigation = nav;
 	
 	console.log("Data : " + JSON.stringify(pageData));
@@ -94,7 +116,7 @@ function implementTemplate(req, pageData, callback) {
 function getPageFromDb(req, callback){
  
     try{   
-        pages.getByPermalink(req.url, function (err, data) 
+        pages.getByPermalink(req.url, config.connString, function (err, data) 
 		{  
 			if(err){return callback(err);}
 			
@@ -104,13 +126,15 @@ function getPageFromDb(req, callback){
 			
 			if(data===null){ 
 				data = {title:"Page not found"}
-				data.contentEditable = false;
 			}
+			
+			data.admin = false;
+			data.contentEditable = "false";
 			
 			if(req.user)
 			{
 				data.admin = true;
-				data.contentEditable = true;
+				data.contentEditable = "true";
 			}
 
 			implementTemplate(req, data, function(err, htmlContent){
@@ -126,14 +150,15 @@ function getPageFromDb(req, callback){
  }
  
 
-exports.setConfig = function(settings){
+setConfig = function(settings){
 	templatePath = settings.templatePath;
 };
 
-exports.getPage =function(req, res) {  
+getPage =function(req, res) { 
 	getPageFromDb(req, function (err, htmlContent)
 	{
-		if(err){console.log(err);return res.send(500);}
+		if(err){console.log(err);
+			return res.send(500);}
 		return res.send(htmlContent);
 	});
 

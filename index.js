@@ -1,24 +1,18 @@
-var express = require('express'); 
-var content = require('./content');
+var express = require('express');  
 var passport = require('passport')
   , GoogleStrategy = require('passport-google').Strategy;
 
 var config = {}; 
-  
 if (typeof String.prototype.endsWith !== 'function') {
     String.prototype.endsWith = function(suffix) {
         return this.indexOf(suffix, this.length - suffix.length) !== -1;
     };
-}
-
-exports.helloWorld = function(){
-    return "Hello, World";
-};
+} 
 
 exports.createServer = function(settings) {
     
 	config = settings; 
-	 
+	
     var server = express();  
     server.use(express.cookieParser()); 
     server.use(express.bodyParser());
@@ -49,13 +43,10 @@ exports.createServer = function(settings) {
         req.logout();
         res.redirect('/');
     });     
-	
+
+    require('./api/contact')(server);
     require('./api/pages')(server);
-	
-	content.setConfig({templatePath : settings.templatePath});
-	
-	/* the default: check for page in db*/
-    server.get('*', content.getPage);
+    require('./content')(server);
     
 	var port = Number(process.env.PORT || settings.port);
 	server.listen(port, function() {
@@ -72,7 +63,7 @@ exports.createServer = function(settings) {
 	passport.use(new GoogleStrategy({
 	   returnURL: 'http://' + config.host + ':' + config.port + '/auth/google/return',
 	   realm: 'http://' + config.host + ':'+ config.port + '/'
-
+	   
 	  },
 	  function(id, profile, done) { 
 		  var User = {"openId":id, emailAddress: profile.emails[0].value, "displayName": profile.displayName}; 
@@ -83,7 +74,7 @@ exports.createServer = function(settings) {
 		  else
 		  {
 			  console.log("Invalid user login attempt by '" + User.emailAddress + "'.");
-			return done(null, false, { message: 'Invalid user account.' });
+			  return done(null, false, { message: 'Invalid user account.' });
 		  } 
 	  }
 	));  
