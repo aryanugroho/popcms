@@ -43,8 +43,9 @@ exports.createServer = function(settings) {
         req.logout();
         res.redirect('/');
     });     
-	
-    require('./api/pages')(server); 
+
+    require('./api/contact')(server);
+    require('./api/pages')(server);
     require('./content')(server);
     
 	var port = Number(process.env.PORT || settings.port);

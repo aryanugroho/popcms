@@ -4,10 +4,11 @@ var sendgrid;
 var config;
 module.exports = function attachHandlers(router) {
     // get requests 
-    router.post('/api/contact/', send);
-    this.config = router.config;
-
-    sendgrid = require('sendgrid')(config.sendgrid.username, config.sendgrid.password);
+    if (router.config.sendgrid !== null) {
+        router.post('/api/contact/', send);
+        config = router.config;
+        sendgrid = require('sendgrid')(config.sendgrid.username, config.sendgrid.password);
+    }
 };
 
 
