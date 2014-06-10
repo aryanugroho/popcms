@@ -2,7 +2,7 @@
 var sendgrid;
 // define the routes for /api/users
 var config;
-module.exports = function attachHandlers(router) { //, passport) { 
+module.exports = function attachHandlers(router) {
     // get requests 
     router.post('/api/contact/', send);
     this.config = router.config;

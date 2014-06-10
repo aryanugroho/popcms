@@ -6,7 +6,7 @@ module.exports = function attachHandlers (router) {
     router.get('/api/pages', list);
     router.get('/api/pages/:id', view); 
     router.post('/api/pages', isAuthenticatedRequest, upsertPermalink); 
-	this.config = router.config; 
+	config = router.config; 
 };
   
 function isAuthenticatedRequest(req, res, next) {
